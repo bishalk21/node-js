@@ -1,0 +1,75 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 170px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.151);
+  /* border-radius: 50%; */
+  box-shadow: 0 0px 35px rgba(0, 0, 0, 0.226);
+}
+
+.letter {
+  font-family: "Audrey", serif;
+  font-size: 50px;
+  font-weight: bold;
+  margin-left: 1px;
+}
+
+.infinity {
+  width: 40px;
+  height: 40px;
+  border-radius: 90px 90px 90px 0;
+  background: linear-gradient(60deg, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #1098ad, #5073b8, #a166ab, #ef4e7b, #f37055);
+  transform: rotate(45deg);
+
+  animation: gradient 5s ease infinite;
+  position: relative;
+}
+
+.infinity:before {
+  content: "";
+  width: 25px;
+  height: 25px;
+  background: #eee;
+  border-radius: 10px 90px 40px 0;
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  z-index: -1;
+
+}
+
+
+.left {
+  transform: rotate(225deg);
+  left: -2px;
+  border-radius: 50%;
+  background: "&lt;/style&gt;";
+}
+
+.right {
+  right: -2px;
+}
+
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
