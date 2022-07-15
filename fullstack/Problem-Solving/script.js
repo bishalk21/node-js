@@ -1,22 +1,20 @@
-// Given a string s, find the length of the longest substring without repeating characters.
+// Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
 
-var lengthOfLongestSubstring = function (s) {
-  let longest = 0;
-  let current = 0;
-  let map = {};
+// You may assume that each input would have exactly one solution, and you may not use the same element twice.
 
-  for (let i = 0; i < s.length; i++) {
-    let char = s[i];
-    console.log(char);
-    if (map[char]) {
-      current = Math.max(current, map[char]);
-      console.log(current);
+// You can return the answer in any order.
+
+// Input: nums = [2,7,11,15], target = 9
+// Output: [0,1]
+// Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+
+var twoSum = function (nums, target) {
+  let result = {};
+  for (let i = 0; i < nums.length; i++) {
+    let diff = target - nums[i];
+    if (result[diff] !== undefined) {
+      return [result[diff], i];
     }
-
-    map[char] = i + 1;
-    longest = Math.max(longest, i - current + 1);
-    console.log(longest);
+    result[nums[i]] = i;
   }
-
-  return longest;
 };
