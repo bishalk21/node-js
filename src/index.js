@@ -1,6 +1,60 @@
 const express = require("express");
+const { authAdmin, userAuth } = require("./middlewares/auth");
 
 const app = express();
+
+// middleware
+// middleware auth for all requests GET, POST, DELETE, PUT
+app.use("/api/v1/admin", authAdmin);
+// app.use("/api/v1/admin", (req, res, next) => {
+//   console.log("Admin auth is getting called");
+// const token = req.headers?.authorization;
+//   const dummyToken = "admin";
+//   const isAdminAuthenticated = dummyToken === "admin";
+//   if (!isAdminAuthenticated) {
+//     res.status(401).send("Unauthorized");
+//   } else {
+//     next();
+//   }
+// });
+
+app.get("/api/v1/admin/getAllUsers", (req, res, next) => {
+  // const token = req.headers?.authorization;
+  //   const dummyToken = "admasdfin";
+  //   const isAdminAuthenticated = dummyToken === "admin";
+  //   if (isAdminAuthenticated) {
+  res.send("all users are fetched");
+  //   } else {
+  // res.status(401).send("Unauthorized");
+  //   }
+});
+
+app.get("/api/v1/admin/deleteUser", (req, res, next) => {
+  //   const dummyToken = "admin";
+  //   const isAdminAuthenticated = dummy === "admin";
+  //   if (isAdminAuthenticated) {
+  res.send("user is deleted");
+  //   } else {
+  //     res.status(401).send("Unauthorized");
+  //   }
+});
+
+app.post("/api/v1/user/login", (req, res, next) => {
+  res.send("User Logged In");
+});
+
+app.get(
+  "/api/v1/user",
+  // middleware auth for this route only
+  userAuth, // can pass multiple middlewares and since user has only one route, we can pass it directly
+  (req, res, next) => {
+    res.send({
+      id: 1,
+      name: "Bishal Karki",
+      email: "karkibishal00@gmail.com",
+    });
+  }
+);
 
 app.use("/api/v1/players", [
   (req, res, next) => {

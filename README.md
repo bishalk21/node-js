@@ -3,6 +3,8 @@
 # Table of Contents
 
 - [How express application works](#how-express-application-works)
+- [Middleware](#what-is-middleware)
+- [Routing](#what-is-routing)
 
 ## About Project
 
@@ -158,6 +160,12 @@ Express is a minimal and flexible Node.js web application framework that provide
   - If the response is sent, it will not execute the next middleware function
 
 ## What is Middleware?
+
+- functions that are executed during the lifecycle of a request to the Express server
+
+> `app.use(middleware)` > `app.use("/path", middleware)` > `app.use("/path", [middleware1, middleware2, middleware3])`
+
+- Suppose in order to update a user in the database by admin, first we need to verify the user is admin or not. So, we can create a middleware function that will check if the user is admin or not. If the user is admin, then only we will allow the user to update the user in the database. Otherwise, we will not allow the user to update the user in the database. This is where middleware functions come into play.
 
 - functions that have access to the request object (req), the response object (res), and the next middleware function in the application’s request-response cycle
 - middleware functions can perform the following tasks:
