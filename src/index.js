@@ -3,6 +3,33 @@ const { authAdmin, userAuth } = require("./middlewares/auth");
 
 const app = express();
 
+// error handling middleware
+app.get("/getAllUsers", (req, res, next) => {
+  // logic of db query and fetching users
+  // if error occurs: may be db connection error, query error, wrong js code, etc
+  //   throw new Error("Error in fetching users"); // not a good practice to throw error like this
+  // use try-catch block
+  try {
+    // logic of db query and fetching users
+    throw new Error("Error in fetching users"); // not a good practice to throw error like this
+    res.send("All users are fetched");
+  } catch (error) {
+    // log the error to know what went wrong
+    // console.log(error);
+    res.status(500).send("Something error occurred. please contact support");
+  }
+});
+
+// in global error handling middleware, we can handle all errors
+// error must be the first parameter
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    // log the error to know what went wrong
+    console.log(err);
+    res.status(500).send("Something went wrong");
+  }
+});
+
 // middleware
 // middleware auth for all requests GET, POST, DELETE, PUT
 app.use("/api/v1/admin", authAdmin);
