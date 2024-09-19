@@ -1,7 +1,40 @@
+require("dotenv").config();
 const express = require("express");
+const connectDB = require("./config/dbConfig");
 const { authAdmin, userAuth } = require("./middlewares/auth");
+const testUser = require("./models/user/user");
 
 const app = express();
+
+// test user
+app.post("/sign-up", async (req, res, next) => {
+  try {
+    const userObj = {
+      firstName: "Bishal",
+      lastName: "Karki",
+      email: "karkibishal00@gmail.com",
+      password: "123",
+      age: 21,
+      gender: "male",
+    };
+
+    // creating a new instance of testUser model => document
+    const user = new testUser(userObj);
+    await user.save(); // returns a promise so we use async-await
+    res.send("User Created");
+  } catch (error) {
+    res.status(500).send("Error saving user:" + error.message);
+  }
+});
+
+app.get("/get-all-users", async (req, res, next) => {
+  try {
+    const users = await testUser.find();
+    res.send(users);
+  } catch (error) {
+    res.status(500).send("Error fetching users:" + error.message);
+  }
+});
 
 // error handling middleware
 app.get("/getAllUsers", (req, res, next) => {
@@ -183,6 +216,14 @@ app.use("/", (req, res, next) => {
   res.send("Hello World");
 });
 
-app.listen(3000, () => {
-  console.log("Server is running on port http://localhost:3000");
-});
+// connect to db
+connectDB()
+  .then(() => {
+    app.listen(3000, () => {
+      console.log("Server is running on port http://localhost:3000");
+    });
+  })
+  .catch((err) => {
+    console.error("Connection error", err);
+    // process.exit(1);
+  });

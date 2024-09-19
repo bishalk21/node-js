@@ -144,6 +144,43 @@ This project is a simple Node.js project that demonstrates how to create a simpl
 - VS Code
 - Git & GitHub
 
+### File Structure
+
+```
+node-js-project
+│
+├── backend
+│   ├── index.js
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── .gitignore
+│   ├── .env
+│   ├── src
+│   │   ├── routes
+│   │   │   ├── userRoutes.js
+│   │   │   ├── connectionRoutes.js
+│   │   │   ├── messageRoutes.js
+│   │   ├── middlewares
+│   │   │   ├── authMiddleware.js
+│   │   │   ├── errorMiddleware.js
+│   │   ├── models
+│   │   │   ├── User.js
+│   │   │   ├── Connection.js
+│   │   │   ├── Message.js
+│   │   ├── config
+│   │   │   ├── db.js
+│   │   ├── helpers
+│   │   │   ├── response.js
+│   │   │   ├── validation.js
+│   │   ├── utils
+│   │   │   ├── logger.js
+│   │   │   ├── constants.js
+│   │   │   ├── error.js
+│   │   ├── controllers
+│   │   │   ├── userController.js
+
+```
+
 ## How express application works
 
 Express is a minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications.
@@ -191,6 +228,32 @@ Express is a minimal and flexible Node.js web application framework that provide
   - compression
   - routing
 
+- `app.listen()`: starts the server and making it listen for incoming requests on the specified port and ip-address(host)
+
+```js
+const express = require("express");
+const app = express();
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
+```
+
+```js
+// 1.  express uses Node.js' built-in HTTP module to create an HTTP server.
+const http = require("http");
+const server = http.createServer(app);
+// 2. bind the server to the specified port and ip-address
+// 4. pass optional callback function to listen() method
+// 5. manages connections, requests, and responses
+server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+server.listen(port, callback);
+// 3. server listens/handles for incoming requests
+server.get("/path", handler);
+```
+
 [Back to top](#table-of-contents)
 
 ## What is Routing?
@@ -225,3 +288,92 @@ Express is a minimal and flexible Node.js web application framework that provide
 
   - request will be hanging (infinite loop) and will timeout after a certain period
   - if any console.log() is present after res.send(), it will throw an error
+
+## MongoDB
+
+> `app.listen() should be called only after the connection to the database is established`
+
+- install mongoose package: `npm install mongoose`
+
+- a NoSQL database that stores data in flexible, JSON-like documents, meaning fields can vary from document to document and data structure can be changed over time
+
+> create mongodb database and collection
+
+```js
+// 1. create a database
+use mydb;
+
+// 2. create a collection
+db.createCollection("users");
+
+// 3. insert a document
+db.users.insertOne({
+  name: "John Doe",
+  email: "sgd@"
+});
+
+// 4. find all documents
+db.users.find();
+
+// 5. find one document
+db.users.findOne({ name: "John Doe" });
+
+// 6. update a document
+db.users.updateOne({ name: "John Doe" }, { $set: { email: "
+" } });
+
+// 7. delete a document
+db.users.deleteOne({ name: "John Doe" });
+```
+
+- MongoDB Atlas: a cloud database service that provides all of the features of MongoDB without the operational heavy lifting required for any new application
+
+- Mongoose: a MongoDB object modeling tool designed to work in an asynchronous environment. Mongoose supports both promises and callbacks.
+
+> connect to mongodb database using mongoose
+
+```js
+const mongoose = require("mongoose");
+
+// 1. connect to mongodb database
+mongoose
+  .connect("mongodb://localhost:27017/mydb", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((error) => {
+    console.log("Error connecting to MongoDB", error.message);
+  });
+
+// 2. create a schema
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+});
+
+// 3. create a model
+const User = mongoose.model("User", userSchema);
+
+// 4. create
+const user = new User({
+  name: "John Doe",
+  email: "
+" });
+
+// 5. save
+user.save();
+```
+
+- Mongoose Schema: a blueprint of the database that defines the shape of the documents within a collection
+
+  - a schema defines the structure of the document, default values, validators, etc.
+  - a schema is a class that defines the structure of the documents that you want to store in MongoDB
+
+- Mongoose Model: a constructor compiled from Schema definitions
+
+- Mongoose Document: an instance of a Model
+
+- Mongoose Query: an abstraction that represents a MongoDB query
