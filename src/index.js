@@ -5,23 +5,42 @@ const { authAdmin, userAuth } = require("./middlewares/auth");
 const testUser = require("./models/user/user");
 
 const app = express();
+// middleware to parse JSON data
+app.use(express.json());
 
 // test user
+// app.post("/sign-up", async (req, res, next) => {
+//   try {
+//     const userObj = {
+//       firstName: "Bishal",
+//       lastName: "Karki",
+//       email: "karkibishal00@gmail.com",
+//       password: "123",
+//       age: 21,
+//       gender: "male",
+//     };
+
+//     // creating a new instance of testUser model
+//     const user = new testUser(userObj);
+//     await user.save(); // returns a promise so we use async-await
+//     res.send("User Created");
+//   } catch (error) {
+//     res.status(500).send("Error saving user:" + error.message);
+//   }
+// });
+
 app.post("/sign-up", async (req, res, next) => {
   try {
-    const userObj = {
-      firstName: "Bishal",
-      lastName: "Karki",
-      email: "karkibishal00@gmail.com",
-      password: "123",
-      age: 21,
-      gender: "male",
-    };
+    // console.log(req); // express responds with object containing request details
 
-    // creating a new instance of testUser model => document
-    const user = new testUser(userObj);
-    await user.save(); // returns a promise so we use async-await
-    res.send("User Created");
+    console.log(req.body);
+    // if the body is empty, it will return undefined
+    // if the body is in JSON format, it will return the undefined as server cannot read JSON data
+    // to read JSON data, we need to use middleware to parse the JSON data (body-parser or express.json())
+
+    const user = new testUser(req.body);
+    await user.save();
+    res.send("User Created Successfully");
   } catch (error) {
     res.status(500).send("Error saving user:" + error.message);
   }

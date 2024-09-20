@@ -39,3 +39,7 @@
 - Create POST /sigup API to add data to database
 - Push some documents using API calls from postman
 - Error Handling using try , catch
+
+- difference between json and javascript object
+- add express.json() middleware to parse the incoming request body
+- make signup api (dynamic) to add user to database
