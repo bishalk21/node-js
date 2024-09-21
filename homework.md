@@ -58,3 +58,7 @@
 - add required, unique, default, lowercase, min, max, minlength, maxlength, trim, timestamps
 - add custom validators (runValidators: true in findOneAndUpdate())
 - improve db schema by adding more fields (appropriate validations)
+
+- data sanitization - add api level validation
+- install validator library
+- explore validator documentation and use it for email, password, name, age, etc

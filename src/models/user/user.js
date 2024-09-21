@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const testUserSchema = new mongoose.Schema({
   //   _id: mongoose.Schema.Types.ObjectId,
@@ -8,17 +9,31 @@ const testUserSchema = new mongoose.Schema({
     minlength: 3,
     maxlength: 50,
   },
+  lastName: {
+    type: String,
+  },
   email: {
     type: String,
     required: true,
     unique: true,
     lowercase: true,
+    trim: true,
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error("Email is invalid: " + value);
+      }
+    },
   },
   password: {
     type: String,
     required: true,
     minlength: 6,
     maxlength: 1024,
+    validate(value) {
+      if (!validator.isStrongPassword(value)) {
+        throw new Error("Password is weak: " + value);
+      }
+    },
   },
   age: {
     type: Number,
@@ -36,6 +51,11 @@ const testUserSchema = new mongoose.Schema({
     type: String,
     default:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSH4dcYWVFHFsz8M3Rsjpy2Hg6gQAmgbCIwWA&s",
+    validate(value) {
+      if (!validator.isURL(value)) {
+        throw new Error("Photo URL is invalid");
+      }
+    },
   },
   about: {
     type: String,

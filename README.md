@@ -670,3 +670,55 @@ await user.save({ runValidators: true });
 - whatever we pass in the request body, its accepted by the schema level validation
 
 > add validation to the every field in the request body
+
+```js
+// 1. add validation to the every field in the request body
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    validate: {
+      validator: function (v) {
+        return /\S+@\S+\.\S+/.test(v);
+      },
+      message: "Email must be a valid email address",
+    },
+  },
+  age: {
+    type: Number,
+    min: 18,
+    max: 65,
+  },
+});
+```
+
+- validator for email validation `npm i validator`
+
+```js
+const validator = require("validator");
+
+const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    validate: {
+      validator: function (v) {
+        return validator.isEmail(v);
+      },
+      message: "Email must be a valid email address",
+    },
+  },
+});
+```
