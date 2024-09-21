@@ -46,6 +46,80 @@ app.post("/sign-up", async (req, res, next) => {
   }
 });
 
+// find user by email
+app.get("/user", async (req, res, next) => {
+  try {
+    const userEmail = req.body.email;
+    const users = await testUser.find({ email: userEmail }); // returns an array of users
+    if (users.length === 0) {
+      res.status(404).send("User not found");
+    } else {
+      res.send(users);
+    }
+  } catch (error) {
+    res.status(500).send("Error fetching user:" + error.message);
+  }
+});
+
+// get all users - feed api
+app.get("/feed", async (req, res, next) => {
+  try {
+    const users = await testUser.find();
+    res.send(users);
+  } catch (error) {
+    res.status(500).send("Error fetching feed:" + error.message);
+  }
+});
+
+// find one user by email
+app.get("/user", async (req, res, next) => {
+  try {
+    const userEmail = req.body.email;
+    const user = await testUser.findOne({ email: userEmail });
+    if (!user) {
+      res.status(404).send("User not found");
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send("Error fetching user:" + error.message);
+  }
+});
+
+// delete user
+app.delete("/user", async (req, res, next) => {
+  try {
+    const userId = req.body.id;
+    const user = await testUser.findByIdAndDelete(userId);
+    if (!user) {
+      res.status(404).send("User not found");
+    } else {
+      res.send("User deleted successfully");
+    }
+  } catch (error) {
+    res.status(500).send("Error deleting user:" + error.message);
+  }
+});
+
+// update user
+app.patch("/user", async (req, res, next) => {
+  try {
+    const userId = req.body.id;
+    const body = req.body;
+    const user = await testUser.findByIdAndUpdate(userId, body, {
+      new: true,
+      returnDocument: "after",
+      runValidators: true,
+    });
+    if (!user) {
+      res.status(404).send("User not found");
+    } else {
+      res.send("User updated successfully");
+    }
+  } catch (error) {
+    res.status(500).send("Error updating user:" + error.message);
+  }
+});
+
 app.get("/get-all-users", async (req, res, next) => {
   try {
     const users = await testUser.find();

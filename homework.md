@@ -43,3 +43,18 @@
 - difference between json and javascript object
 - add express.json() middleware to parse the incoming request body
 - make signup api (dynamic) to add user to database
+- user.findOne() and user.save()
+- user.find() and user.findById()
+- in findOne({email: req.body.email}) , what will be the output if there are multiple documents with same email id
+  - findOne() will return the first document it finds
+  - note: email should be unique and no two users should have same email id
+- create a delete user api
+- create an update user api
+- explore mongoose documentation for model methods
+- options in model.findOneAndUpdate() method, explore documentation
+- update user with email id (model.findOneAndUpdate())
+
+- schemaType options in mongoose documentation
+- add required, unique, default, lowercase, min, max, minlength, maxlength, trim, timestamps
+- add custom validators (runValidators: true in findOneAndUpdate())
+- improve db schema by adding more fields (appropriate validations)

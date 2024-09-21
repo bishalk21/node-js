@@ -1,5 +1,16 @@
 # Node.js Project
 
+- overall
+  - create a server using express.js
+  - create routes for different endpoints
+  - create a database using MongoDB and connect to the database
+  - create a schema and model for the database
+  - create APIs to perform CRUD operations
+  - create a middleware for authentication, error handling, etc.
+  - data input sanitization and validation
+
+> server + mongodb > middlewares > routes > controllers > models > database
+
 # Table of Contents
 
 - [How express application works](#how-express-application-works)
@@ -7,8 +18,10 @@
 - [Routing](#what-is-routing)
 - [MongoDB](#mongodb)
   - [Mongoose](#mongoose)
+  - [schemaTypes in Mongoose](#schematypes-in-mongoose)
   - [Fields in MongoDB](#fields-in-mongodb)
   - [\_\_id field and \_\_v field in MongoDB](#_id-field-and-__v-field-in-mongodb)
+- [Data Input Sanitization and Validation](#data-input-sanitization-and-validation)
 
 ## About Project
 
@@ -438,6 +451,149 @@ user.save();
 
 [Back to top](#table-of-contents)
 
+### schemaTypes in Mongoose
+
+- String: for strings
+- Number: for numbers
+- Date: for dates
+- Buffer: for binary data
+- Boolean: for true/false values
+- Mixed: for mixed types
+- ObjectId: for object IDs
+- Array: for arrays
+
+```js
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  age: Number,
+
+  // nested schema
+  address: {
+    street: String,
+    city: String,
+    state: String,
+    zip: Number,
+  },
+
+  // array of strings
+  hobbies: [String],
+
+  // array of objects
+  friends: [
+    {
+      name: String,
+      email: String,
+    },
+  ],
+});
+```
+
+- SchemaType Options
+
+  - required: boolean or function, if true, the value is required
+  - default: any, sets a default value for the path
+  - select: boolean, specifies default projections for queries
+  - validate: function, adds a validator function for this property
+    - in update operations, runValidators: true must be passed to explicitly run validators
+  - get: function, defines a custom getter for this property
+  - set: function, defines a custom setter for this property
+  - alias: string, defines a virtual with the given name that gets/sets this path
+
+```js
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+  },
+  age: {
+    type: Number,
+    min: 18,
+    max: 65,
+  },
+```
+
+- unique: boolean, if true, the value must be unique across the collection
+- min: number, specifies the minimum value for the path
+- max: number, specifies the maximum value for the path
+- enum: array, specifies the allowed values for the path
+- match: RegExp, specifies a regular expression that the string must match
+- lowercase: boolean, if true, the string will be converted to lowercase
+- uppercase: boolean, if true, the string will be converted to uppercase
+- trim: boolean, if true, the string will be trimmed
+
+```js
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+  },
+  age: {
+    type: Number,
+    min: 18,
+    max: 65,
+  },
+});
+```
+
+- validate: function, adds a validator function for this property
+  - in update operations, runValidators: true must be passed to explicitly run validators
+
+```js
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    validate: {
+      validator: function (v) {
+        return v.length > 2;
+      },
+      message: "Name must be at least 3 characters",
+    },
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    validate: {
+      validator: function (v) {
+        return /\S+@\S+\.\S+/.test(v);
+      },
+      message: "Email must be a valid email address",
+    },
+  },
+  age: {
+    type: Number,
+    min: 18,
+    max: 65,
+  },
+});
+```
+
+```js
+// run validators
+await user.save({ runValidators: true });
+```
+
 ### Fields in MongoDB
 
 ### \_id field and \_\_v field in MongoDB
@@ -473,3 +629,36 @@ user.save();
    - tracks the version of the document for optimistic concurrency control when when multiple updates are happening on the same document at the same time, Mongoose can detect conflicts and prevent unintended overwrites.
    - mongoose adds automatically starting from 0 when a new document is created and increments by 1 every time the document is updated
    - helpful for complex operations where different processes might be updating the same document at the same time
+
+[Back to top](#table-of-contents)
+
+## Data Input Sanitization and Validation
+
+- mostly data input happens through the user interface (UI) in the form of forms, fields, etc, which is in the post request body and in server side, we need to validate and sanitize the data before storing it in the database
+
+- Data Input Sanitization: the process of cleaning and validating user input to prevent security vulnerabilities
+
+  - prevent SQL Injection
+  - prevent NoSQL Injection
+  - prevent Cross-Site Scripting (XSS)
+  - prevent Cross-Site Request Forgery (CSRF)
+  - prevent Command Injection
+  - prevent Path Traversal
+  - prevent Code Injection
+  - prevent LDAP Injection
+  - prevent XML Injection
+  - prevent Sensitive Data Exposure
+  - prevent Broken Authentication
+  - prevent Broken Access Control
+  - prevent Insecure Deserialization
+  - prevent Security Misconfiguration
+  - prevent Insufficient Logging & Monitoring
+  - prevent Insecure Direct Object References
+  - prevent Unvalidated Redirects & Forwards
+
+- Data Input Validation: the process of ensuring that the data provided by the user meets the requirements of the application
+
+  - prevent invalid data from being stored in the database
+  - prevent invalid data from being processed by the application
+  - prevent invalid data from being displayed to the user
+  - prevent invalid data from being sent to other systems
