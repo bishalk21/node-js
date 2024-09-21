@@ -8,8 +8,9 @@
   - create APIs to perform CRUD operations
   - create a middleware for authentication, error handling, etc.
   - data input sanitization and validation
+  - encrypting passwords before storing in the database
 
-> server + mongodb > middlewares > routes > controllers > models > database
+> server + mongodb > middlewares > routes [request handlers + API level - validation + sanitization + encryption] > controllers > models [db level - validation + sanitization] > database > response
 
 # Table of Contents
 
@@ -18,10 +19,11 @@
 - [Routing](#what-is-routing)
 - [MongoDB](#mongodb)
   - [Mongoose](#mongoose)
+  - [Data Input Sanitization and Validation](#data-input-sanitization-and-validation)
   - [schemaTypes in Mongoose](#schematypes-in-mongoose)
   - [Fields in MongoDB](#fields-in-mongodb)
   - [\_\_id field and \_\_v field in MongoDB](#_id-field-and-__v-field-in-mongodb)
-- [Data Input Sanitization and Validation](#data-input-sanitization-and-validation)
+- [Encrypting Passwords](#encrypting-passwords)
 
 ## About Project
 
@@ -239,6 +241,7 @@ Express is a minimal and flexible Node.js web application framework that provide
 > `GET /api/v1/players [request] > express checks all the app.xxx() methods [routes] and middleware functions > request handlers [callback functions] > response [send back to the client]`
 
 - As soon as request comes in (GET /api/v1/players) to express application
+
   - Express will look for the route handler (METHOD & PATH) that matches the request
   - If it finds the route handler, it will execute the callback function or
   - express will go through the chain of middleware functions until it solves the request
@@ -246,6 +249,10 @@ Express is a minimal and flexible Node.js web application framework that provide
   - If the route handler is found but the response is not sent, it will hang
   - and will timeout after a certain period
   - If the response is sent, it will not execute the next middleware function
+
+- Request > Middleware > Route Handler > Response
+
+> NEVER trust request.body, request.query, request.params
 
 ## What is Middleware?
 
@@ -722,3 +729,31 @@ const userSchema = new mongoose.Schema({
   },
 });
 ```
+
+[Back to top](#table-of-contents)
+
+### Encrypting Passwords
+
+- never store passwords in plain text in the database
+- always hash the passwords before storing them in the database
+- use a strong hashing algorithm like bcrypt to hash the passwords
+- bcrypt: a password-hashing function designed to be slow and computationally intensive to protect against brute force attacks
+
+> encrypting passwords before storing in the database
+
+```js
+const bcrypt = require("bcrypt");
+
+// 1. hash the password
+const salt = await bcrypt.genSalt(10);
+const hashedPassword = await bcrypt.hash("123", salt);
+
+// 2. compare the password
+const isValid = await bcrypt.compare("123", hashedPassword);
+```
+
+- bcrypt.genSalt(): generates a salt for the hash
+- bcrypt.hash(): generates a hash for the password
+- bcrypt.compare(): compares the password with the hash
+
+[Back to top](#table-of-contents)

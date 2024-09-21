@@ -3,6 +3,8 @@ const express = require("express");
 const connectDB = require("./config/dbConfig");
 const { authAdmin, userAuth } = require("./middlewares/auth");
 const testUser = require("./models/user/user");
+const { validateSignUpData } = require("./helpers/validation");
+const { hashPassword } = require("./helpers/bcryptHelper");
 
 const app = express();
 // middleware to parse JSON data
@@ -33,12 +35,27 @@ app.post("/sign-up", async (req, res, next) => {
   try {
     // console.log(req); // express responds with object containing request details
 
+    // encrypting password
+    //  validation of data
+    validateSignUpData(req);
+
+    // encrypting password
+    const password = req.body.password;
+    const hashedPassword = await hashPassword(password);
+
     console.log(req.body);
     // if the body is empty, it will return undefined
     // if the body is in JSON format, it will return the undefined as server cannot read JSON data
     // to read JSON data, we need to use middleware to parse the JSON data (body-parser or express.json())
 
-    const user = new testUser(req.body);
+    // saving user
+    const newUser = {
+      ...req.body,
+      password: hashedPassword,
+    };
+
+    const user = new testUser(newUser);
+    // const user = new testUser(req.body);
     await user.save();
     res.send("User Created Successfully");
   } catch (error) {

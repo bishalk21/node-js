@@ -62,3 +62,7 @@
 - data sanitization - add api level validation
 - install validator library
 - explore validator documentation and use it for email, password, name, age, etc
+
+- never trust the data coming from the client
+- install bcrypt library
+- hash the password before saving it to the database
