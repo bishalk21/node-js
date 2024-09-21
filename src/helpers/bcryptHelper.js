@@ -5,4 +5,8 @@ const hashPassword = (plainPassword) => {
   return bcrypt.hash(plainPassword, saltRound);
 };
 
-module.exports = { hashPassword };
+const comparePassword = (plainPassword, hashedPassword) => {
+  return bcrypt.compare(plainPassword, hashedPassword);
+};
+
+module.exports = { hashPassword, comparePassword };

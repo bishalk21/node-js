@@ -4,7 +4,8 @@ const connectDB = require("./config/dbConfig");
 const { authAdmin, userAuth } = require("./middlewares/auth");
 const testUser = require("./models/user/user");
 const { validateSignUpData } = require("./helpers/validation");
-const { hashPassword } = require("./helpers/bcryptHelper");
+const { hashPassword, comparePassword } = require("./helpers/bcryptHelper");
+const validator = require("validator");
 
 const app = express();
 // middleware to parse JSON data
@@ -161,6 +162,38 @@ app.patch("/user/:id", async (req, res, next) => {
     }
   } catch (error) {
     res.status(500).send("Error updating user: " + error.message);
+  }
+});
+
+// login api
+app.post("/login", async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    // validate email
+    if (!email) {
+      res.status(400).send("Email is required");
+    } else if (!validator.isEmail(email)) {
+      res.status(400).send("Email is invalid");
+    }
+
+    // find user by email
+    const user = await testUser.findOne({
+      email,
+    });
+    if (!user) {
+      res.status(404).send("Invalid credentials");
+    }
+
+    // compare password
+    const isPasswordMatched = await comparePassword(password, user.password);
+    if (!isPasswordMatched) {
+      res.status(401).send("Invalid credentials");
+    } else {
+      res.send("User logged in successfully");
+    }
+  } catch (error) {
+    res.status(500).send("Error logging in user:" + error.message);
   }
 });
 
