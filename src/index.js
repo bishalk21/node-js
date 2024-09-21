@@ -101,10 +101,37 @@ app.delete("/user", async (req, res, next) => {
 });
 
 // update user
-app.patch("/user", async (req, res, next) => {
+// api level data sanitization
+// app.patch("/user", async (req, res, next) => {
+// if we want to update the user, we need to pass the id of the user
+// we can pass the id in the body or in the params
+// if we pass the id in the body, we need to pass the id in the body
+// if we pass the id in the params, we need to pass the id in the params
+app.patch("/user/:id", async (req, res, next) => {
   try {
-    const userId = req.body.id;
+    // if we pass the id in the body
+    // const userId = req.body.id;
+
+    // if we pass the id in the params
+    const userId = req.params?.id;
     const body = req.body;
+
+    // only allow update of certain fields
+    const UPDATE_ALLOWED_FIELDS = ["photoUrl", "about", "skills"];
+
+    // check if the fields are allowed to be updated
+    const isUpdateAllowed = Object.keys(body).every((field) =>
+      UPDATE_ALLOWED_FIELDS.includes(field)
+    );
+
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed");
+    }
+
+    if (body?.skills?.length > 10) {
+      throw new Error("Skills cannot be more than 10");
+    }
+
     const user = await testUser.findByIdAndUpdate(userId, body, {
       new: true,
       returnDocument: "after",
@@ -116,7 +143,7 @@ app.patch("/user", async (req, res, next) => {
       res.send("User updated successfully");
     }
   } catch (error) {
-    res.status(500).send("Error updating user:" + error.message);
+    res.status(500).send("Error updating user: " + error.message);
   }
 });
 

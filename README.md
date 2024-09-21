@@ -451,6 +451,37 @@ user.save();
 
 [Back to top](#table-of-contents)
 
+## Data Input Sanitization and Validation
+
+- mostly data input happens through the user interface (UI) in the form of forms, fields, etc, which is in the post request body and in server side, we need to validate and sanitize the data before storing it in the database
+
+- Data Input Sanitization: the process of cleaning and validating user input to prevent security vulnerabilities
+
+  - prevent SQL Injection
+  - prevent NoSQL Injection
+  - prevent Cross-Site Scripting (XSS)
+  - prevent Cross-Site Request Forgery (CSRF)
+  - prevent Command Injection
+  - prevent Path Traversal
+  - prevent Code Injection
+  - prevent LDAP Injection
+  - prevent XML Injection
+  - prevent Sensitive Data Exposure
+  - prevent Broken Authentication
+  - prevent Broken Access Control
+  - prevent Insecure Deserialization
+  - prevent Security Misconfiguration
+  - prevent Insufficient Logging & Monitoring
+  - prevent Insecure Direct Object References
+  - prevent Unvalidated Redirects & Forwards
+
+- Data Input Validation: the process of ensuring that the data provided by the user meets the requirements of the application
+
+  - prevent invalid data from being stored in the database
+  - prevent invalid data from being processed by the application
+  - prevent invalid data from being displayed to the user
+  - prevent invalid data from being sent to other systems
+
 ### schemaTypes in Mongoose
 
 - String: for strings
@@ -632,33 +663,10 @@ await user.save({ runValidators: true });
 
 [Back to top](#table-of-contents)
 
-## Data Input Sanitization and Validation
+## API level validation
 
-- mostly data input happens through the user interface (UI) in the form of forms, fields, etc, which is in the post request body and in server side, we need to validate and sanitize the data before storing it in the database
+- Problems with schema level validation
+  - fields like emailId changes if updated
+- whatever we pass in the request body, its accepted by the schema level validation
 
-- Data Input Sanitization: the process of cleaning and validating user input to prevent security vulnerabilities
-
-  - prevent SQL Injection
-  - prevent NoSQL Injection
-  - prevent Cross-Site Scripting (XSS)
-  - prevent Cross-Site Request Forgery (CSRF)
-  - prevent Command Injection
-  - prevent Path Traversal
-  - prevent Code Injection
-  - prevent LDAP Injection
-  - prevent XML Injection
-  - prevent Sensitive Data Exposure
-  - prevent Broken Authentication
-  - prevent Broken Access Control
-  - prevent Insecure Deserialization
-  - prevent Security Misconfiguration
-  - prevent Insufficient Logging & Monitoring
-  - prevent Insecure Direct Object References
-  - prevent Unvalidated Redirects & Forwards
-
-- Data Input Validation: the process of ensuring that the data provided by the user meets the requirements of the application
-
-  - prevent invalid data from being stored in the database
-  - prevent invalid data from being processed by the application
-  - prevent invalid data from being displayed to the user
-  - prevent invalid data from being sent to other systems
+> add validation to the every field in the request body
