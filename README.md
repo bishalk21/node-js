@@ -27,6 +27,7 @@
 - [Authentication](#authentication)
   - [TCP/IP Connection](#tcpip-connection)
   - [Cookies in Express](#cookies-in-express)
+  - [JWT (JSON Web Tokens)](#jwt-json-web-tokens)
 
 ## About Project
 
@@ -929,7 +930,9 @@ const jwt = require("jsonwebtoken");
 // 1. create a token
 // jwt.sign(payload, secret-key, options)
 // jwt.sign(payload/id:hidden, secret-key: which no one knows except the server, options: expiresIn)
-const token = jwt.sign({ _id: user._id }, "secret-key or private-key");
+const token = jwt.sign({ _id: user._id }, "secret-key or private-key", {
+  expiresIn: "1h",
+});
 ```
 
 - jwt.sign(): generates a token
@@ -943,8 +946,10 @@ const decoded = jwt.verify(token, "secret-key");
 ```
 
 - jwt.verify(): verifies a token and returns the decoded payload
+
+- payload: a JSON object that contains the data that is being transferred
 - secret-key: a secret key that is used to sign the token\
-- expiresIn: a time in seconds or a string describing a time span (e.g., 60, "2 days", "10h", "7d")
+- expiresIn: a time in seconds or a string describing a time span (e.g., 60, "2 days", "10h", "7d", "never")
 
 - JWT Structure
 
@@ -1000,3 +1005,77 @@ const decoded = jwt.verify(token, "secret-key");
   - always use the latest version of the library
 
 [Back to top](#table-of-contents)
+
+### Auth Middleware, token verification and protecting routes
+
+- middleware function that verifies the token and allows the user to access the protected routes
+
+> auth middleware in express
+
+```js
+const jwt = require("jsonwebtoken");
+
+// 1. auth middleware
+const authToken = async (req, res, next) => {
+  // 2. read a token
+  const token = req.cookies.token;
+
+  // 3. if no token, return 401
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    // 4. verify a token
+    const decoded = jwt.verify(token, "secret-key");
+
+    // 5. find user by id
+    const user = await User.findById(decoded._id);
+
+    // 6. if no user, return 401
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // 7. allow user to access the protected routes
+    req.user = user;
+
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+};
+```
+
+[Back to top](#table-of-contents)
+
+### Mongoose schema methods
+
+- instance methods: methods that are available on the instance of the model
+
+```js
+// 1. create a schema
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+});
+
+// 2. create an instance method
+userSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+// 3. create a model
+const User = mongoose.model("User", userSchema);
+
+// 4. create an instance of the model
+const user = new User({
+  name: "John Doe",
+  email: "jojjj@gmail.com",
+  password: "123",
+});
+
+// 5. use the instance method
+const isValid = await user.comparePassword("123");
+```

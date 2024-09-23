@@ -75,3 +75,5 @@
 - in login api, check if email and password are correct
 - create a token using jwt.sign() and send it to the client
 - read the token from the client and verify it using jwt.verify() in /profile api and send the user data
+
+- user authentication using jwt

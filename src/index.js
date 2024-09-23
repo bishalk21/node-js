@@ -1,13 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/dbConfig");
-const { authAdmin, userAuth } = require("./middlewares/auth");
+const { authAdmin, authAdmins, userAuth } = require("./middlewares/auth");
 const testUser = require("./models/user/user");
 const { validateSignUpData } = require("./helpers/validation");
 const { hashPassword, comparePassword } = require("./helpers/bcryptHelper");
 const validator = require("validator");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { createSignAccessJWT, verifyJwtToken } = require("./helpers/jwtHelper");
 
 const app = express();
 // middleware to parse JSON data
@@ -175,9 +176,9 @@ app.post("/login", async (req, res, next) => {
 
     // validate email
     if (!email) {
-      res.status(400).send("Email is required");
+      throw new Error("Email is required");
     } else if (!validator.isEmail(email)) {
-      res.status(400).send("Email is invalid");
+      throw new Error("Email is invalid");
     }
 
     // find user by email
@@ -185,55 +186,62 @@ app.post("/login", async (req, res, next) => {
       email,
     });
     if (!user) {
-      res.status(404).send("Invalid credentials");
+      throw new Error("Invalid credentials");
     }
 
     // compare password
-    const isPasswordMatched = await comparePassword(password, user.password);
+    const isPasswordMatched = await user.validatePassword(password);
     if (!isPasswordMatched) {
-      res.status(401).send("Invalid credentials");
+      throw new Error("Invalid credentials");
     } else {
       // generate token (JWT)
-      const token = await jwt.sign({ id: user._id }, "mysecretkey");
+      // const token = await jwt.sign({ id: user._id }, "mysecretkey");
+      const token = await user.createJWT();
 
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      });
       res.send("User logged in successfully");
     }
   } catch (error) {
-    res.status(500).send("Error logging in user:" + error.message);
+    res.status(500).send("Error logging in user: " + error.message);
   }
 });
 
 // route only after cookie is set or after login success
-app.get("/dashboard", async (req, res, next) => {
+app.get("/dashboard", authAdmin, async (req, res, next) => {
   try {
-    const cookie = req.cookies;
-
+    // get the cookie
+    // console.log(req.cookies);
     // check if the cookie is set
     // console.log(cookie);
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
 
     // if token, ==> valid user and can access the dashboard
     // if no token, ==> invalid user and not authorized
-    if (!token) {
-      throw new Error("Unauthorized");
-    }
+    // if (!token) {
+    //   throw new Error("Unauthorized");
+    // }
 
     // if token is present, then user is authorized
 
     // verify token
-    const decoded = jwt.verify(token, "mysecretkey");
+    // const decoded = jwt.verify(jwtToken, "mysecretkey");
+    // const decoded = await verifyJwtToken(token);
+
     // console.log(decoded); // decoded token is the payload of the token or the id of the user and iat (issued at) in object format
-    const { id } = decoded;
+    // const { id } = decoded;
 
     // res.send("Dashboard");
-    const user = await testUser.findById(id);
-    if (!user) {
-      throw new Error("User not found");
-    }
+    // const user = await testUser.findById(id);
+    // if (!user) {
+    //   throw new Error("User not found");
+    // }
+
+    const user = req.user;
     res.send(user);
   } catch (error) {
-    res.status(500).send("Error fetching dashboard:" + error.message);
+    res.status(500).send("Error fetching dashboard: " + error.message);
   }
 });
 
@@ -275,7 +283,7 @@ app.use("/", (err, req, res, next) => {
 
 // middleware
 // middleware auth for all requests GET, POST, DELETE, PUT
-app.use("/api/v1/admin", authAdmin);
+app.use("/api/v1/admin", authAdmins);
 // app.use("/api/v1/admin", (req, res, next) => {
 // console.log("Admin auth is getting called");
 // const token = req.headers?.authorization;
