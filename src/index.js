@@ -6,10 +6,13 @@ const testUser = require("./models/user/user");
 const { validateSignUpData } = require("./helpers/validation");
 const { hashPassword, comparePassword } = require("./helpers/bcryptHelper");
 const validator = require("validator");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 // middleware to parse JSON data
 app.use(express.json());
+app.use(cookieParser());
 
 // test user
 // app.post("/sign-up", async (req, res, next) => {
@@ -44,7 +47,7 @@ app.post("/sign-up", async (req, res, next) => {
     const password = req.body.password;
     const hashedPassword = await hashPassword(password);
 
-    console.log(req.body);
+    // console.log(req.body);
     // if the body is empty, it will return undefined
     // if the body is in JSON format, it will return the undefined as server cannot read JSON data
     // to read JSON data, we need to use middleware to parse the JSON data (body-parser or express.json())
@@ -190,10 +193,47 @@ app.post("/login", async (req, res, next) => {
     if (!isPasswordMatched) {
       res.status(401).send("Invalid credentials");
     } else {
+      // generate token (JWT)
+      const token = await jwt.sign({ id: user._id }, "mysecretkey");
+
+      res.cookie("token", token);
       res.send("User logged in successfully");
     }
   } catch (error) {
     res.status(500).send("Error logging in user:" + error.message);
+  }
+});
+
+// route only after cookie is set or after login success
+app.get("/dashboard", async (req, res, next) => {
+  try {
+    const cookie = req.cookies;
+
+    // check if the cookie is set
+    // console.log(cookie);
+    const { token } = req.cookies;
+
+    // if token, ==> valid user and can access the dashboard
+    // if no token, ==> invalid user and not authorized
+    if (!token) {
+      throw new Error("Unauthorized");
+    }
+
+    // if token is present, then user is authorized
+
+    // verify token
+    const decoded = jwt.verify(token, "mysecretkey");
+    // console.log(decoded); // decoded token is the payload of the token or the id of the user and iat (issued at) in object format
+    const { id } = decoded;
+
+    // res.send("Dashboard");
+    const user = await testUser.findById(id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send("Error fetching dashboard:" + error.message);
   }
 });
 
@@ -218,7 +258,7 @@ app.get("/getAllUsers", (req, res, next) => {
     res.send("All users are fetched");
   } catch (error) {
     // log the error to know what went wrong
-    // console.log(error);
+    console.log(error);
     res.status(500).send("Something error occurred. please contact support");
   }
 });
@@ -237,7 +277,7 @@ app.use("/", (err, req, res, next) => {
 // middleware auth for all requests GET, POST, DELETE, PUT
 app.use("/api/v1/admin", authAdmin);
 // app.use("/api/v1/admin", (req, res, next) => {
-//   console.log("Admin auth is getting called");
+// console.log("Admin auth is getting called");
 // const token = req.headers?.authorization;
 //   const dummyToken = "admin";
 //   const isAdminAuthenticated = dummyToken === "admin";
@@ -288,7 +328,7 @@ app.get(
 
 app.use("/api/v1/players", [
   (req, res, next) => {
-    console.log("Middleware 1");
+    // console.log("Middleware 1");
     // next();
     // res.send("Players Route 1");
     next();
@@ -297,34 +337,34 @@ app.use("/api/v1/players", [
   // if once response is sent in the route,
   //it cannot be sent again in the same route handler
   (req, res, next) => {
-    console.log("Middleware 2");
+    // console.log("Middleware 2");
     // res.send("Players Route 2");
     next();
   },
   // can have multiple handlers
   (req, res, next) => {
-    console.log("Middleware 3");
+    // console.log("Middleware 3");
     next();
   },
   (req, res, next) => {
-    console.log("Middleware 4");
+    // console.log("Middleware 4");
     // res.send("Players Route 4");
     next();
   },
   (req, res) => {
-    console.log("Middleware 5");
+    // console.log("Middleware 5");
     res.send("Players Route 5");
   },
 ]);
 
 // another way of calling multiple handlers
 app.get("/api/v1/player", (req, res, next) => {
-  console.log("Middleware 1");
+  // console.log("Middleware 1");
   next();
 });
 
 app.get("/api/v1/player", (req, res, next) => {
-  console.log("Middleware 2");
+  // console.log("Middleware 2");
   next();
 });
 
@@ -345,7 +385,7 @@ app.get(/.*fly$/, (req, res, next) => {
 
 // params
 app.get("/user?userId=101&password=123", (req, res, next) => {
-  console.log(req.query);
+  // console.log(req.query);
 });
 
 // dynamic routes

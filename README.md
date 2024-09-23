@@ -24,6 +24,9 @@
   - [Fields in MongoDB](#fields-in-mongodb)
   - [\_\_id field and \_\_v field in MongoDB](#_id-field-and-__v-field-in-mongodb)
 - [Encrypting Passwords](#encrypting-passwords)
+- [Authentication](#authentication)
+  - [TCP/IP Connection](#tcpip-connection)
+  - [Cookies in Express](#cookies-in-express)
 
 ## About Project
 
@@ -755,5 +758,245 @@ const isValid = await bcrypt.compare("123", hashedPassword);
 - bcrypt.genSalt(): generates a salt for the hash
 - bcrypt.hash(): generates a hash for the password
 - bcrypt.compare(): compares the password with the hash
+
+[Back to top](#table-of-contents)
+
+## Authentication
+
+- the process of verifying the identity of a user
+
+> user signs in
+> server verifies the user's credentials (validates the email and password)
+> server hashes the password and compares it with the hashed password stored in the database
+> server creates a token (JWT) and signs the token with a secret key
+> server adds the token to the cookie
+
+- Types of Authentication
+
+  - Basic Authentication: username and password
+  - Token-based Authentication: JWT (JSON Web Tokens)
+  - OAuth: Open Authorization
+  - OAuth2: Open Authorization 2.0
+  - SAML: Security Assertion Markup Language
+  - OpenID: OpenID Connect
+  - LDAP: Lightweight Directory Access Protocol
+  - SSO: Single Sign-On
+  - MFA: Multi-Factor Authentication
+
+- when user is making a request to the server, TCP/IP connection is established between the client and the server and the server needs to verify the user is authenticated or not before processing the request.
+
+### TCP/IP Connection
+
+- during the TCP/IP connection, the client and the server exchange packets of data over the network
+
+  - once the client sends a request to the server, the server re eives the request and processes it or sends a response(data) back to the client and closes the connection. this is repeated for every request made by the client. this is how the client and the server communicate with each other over the tcp/ip connection.
+
+- Transmission Control Protocol (TCP): a connection-oriented protocol that provides reliable, ordered, and error-checked delivery of a stream of bytes between applications running on hosts communicating over an IP network
+
+- Internet Protocol (IP): a network-layer protocol that provides the routing and addressing of packets between hosts
+
+- TCP/IP Connection Establishment
+
+  - 3-way handshake: a method used in a TCP/IP network to create a connection between a local host/client and a server
+
+    - SYN: the client sends a SYN packet to the server to initiate a connection
+    - SYN-ACK: the server responds with a SYN-ACK packet to acknowledge the request
+    - ACK: the client sends an ACK packet to acknowledge the response
+
+  - 4-way handshake: a method used in a TCP/IP network to terminate a connection between a local host/client and a server
+
+    - FIN: the client sends a FIN packet to the server to close the connection
+    - ACK: the server responds with an ACK packet to acknowledge the request
+    - FIN: the server sends a FIN packet to the client to close the connection
+    - ACK: the client responds with an ACK packet to acknowledge the request
+
+- TCP/IP Connection Termination
+
+  - 4-way handshake: a method used in a TCP/IP network to terminate a connection between a local host/client and a server
+
+    - FIN: the client sends a FIN packet to the server to close the connection
+    - ACK: the server responds with an ACK packet to acknowledge the request
+    - FIN: the server sends a FIN packet to the client to close the connection
+    - ACK: the client responds with an ACK packet to acknowledge the request
+
+  - what happens when a client requests a login request?
+
+    - the client sends a login request (email and password) to the server
+    - the server receives the login request and verifies the user's credentials (validates the email and password)
+    - server creates a token (JWT), and wrap token inside a cookie,
+
+      - server can set the expiration time for the token (1 hour, 1 day, 1 week, etc.)
+
+    - server signs the token with a secret key, and sends the cookie back to the client in response
+    - browser stores the cookie in its storage
+    - client sends the token in the header of every request to the server, and server verifies the token with the secret key and allows the user to access the protected routes
+
+- what if client request with expired token?
+
+  - server sends a response with status code 401 (Unauthorized) and client needs to login again to get a new token
+
+### Cookies in Express
+
+> need cookie-parser package for handling cookies in express: `npm install cookie-parser`
+
+    - cookies are in the form of key-value pairs or objects that are stored in the client's browser
+    - to parse the cookies in express, we need to use the cookie-parser middleware
+
+    ```js
+    const cookieParser = require("cookie-parser");
+    app.use(cookieParser());
+
+    app.get("/", (req, res) => {
+      // read a cookie
+      const token = req.cookies.token;
+      console.log(token); // token value
+      res.send("Hello World");
+    });
+    ```
+
+    - if no cookie is available, then req.cookies will be an empty object: `[Object: null prototype] {}`
+
+> the browser receives the cookie and stores it in its storage, and sends the cookie in the header of every request to the server
+
+- a small piece of data stored in the client's browser that is sent to the server with every request
+- used to store user information, session data, and other data that needs to be persisted across requests
+
+> create a cookie in express
+
+```js
+// 1. create a cookie
+// res.cookie(name, value, options)
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  maxAge: 3600000,
+});
+```
+
+- httpOnly: boolean, if true, the cookie is only accessible from the server and not from the client-side JavaScript
+- secure: boolean, if true, the cookie is only sent over HTTPS
+- sameSite: string, specifies the SameSite attribute of the cookie
+- maxAge: number, specifies the maximum age of the cookie in milliseconds
+
+> read a cookie in express
+
+```js
+// 2. read a cookie
+// req.cookies
+const token = req.cookies.token;
+```
+
+- req.cookies: an object that contains all the cookies sent by the client in the request
+
+> delete a cookie in express
+
+```js
+// 3. delete a cookie
+// res.clearCookie(name, options)
+res.clearCookie("token", {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+});
+```
+
+- res.clearCookie(): deletes a cookie by name
+
+[Back to top](#table-of-contents)
+
+### JWT (JSON Web Tokens)
+
+- jwt and express
+
+  > jwt.sign(payload, secret-key, options) ==> token
+  > res.cookie("token", token, options) ==> cookie
+  > req.cookies.token ==> token
+  > jwt.verify(token, secret-key) ==> payload or decoded ==> {id, iat}
+  > payload ==> {id, iat}
+  > user ==> find user by id
+  > allow user to access the protected routes
+  > token only allows the user to access the protected routes that are authorized
+
+- a compact, URL-safe means of representing claims to be transferred between two parties
+- a token that is used to authenticate users and authorize access to protected routes
+
+> create a token in express
+
+```js
+const jwt = require("jsonwebtoken");
+
+// 1. create a token
+// jwt.sign(payload, secret-key, options)
+// jwt.sign(payload/id:hidden, secret-key: which no one knows except the server, options: expiresIn)
+const token = jwt.sign({ _id: user._id }, "secret-key or private-key");
+```
+
+- jwt.sign(): generates a token
+- jwt.verify(): verifies a token
+
+> verify a token in express
+
+```js
+// 2. verify a token
+const decoded = jwt.verify(token, "secret-key");
+```
+
+- jwt.verify(): verifies a token and returns the decoded payload
+- secret-key: a secret key that is used to sign the token\
+- expiresIn: a time in seconds or a string describing a time span (e.g., 60, "2 days", "10h", "7d")
+
+- JWT Structure
+
+  - Header: contains the type of the token and the signing algorithm (red)
+  - Payload: contains the claims (data) that are being transferred (purple)
+  - Signature: contains the encoded header, the encoded payload, the secret key, and the signing algorithm (blue)
+
+  ```json
+  // JWT Structure
+  {
+    "header": {
+      "alg": "HS256",
+      "typ": "JWT"
+    },
+    "payload": {
+      "sub": "1234567890",
+      "name": "John Doe",
+      "admin": true
+    },
+    "signature": "HMACSHA256(base64UrlEncode(header) + '.' + base64UrlEncode(payload), secret)"
+  }
+  ```
+
+- JWT Claims
+
+  - iss: issuer
+  - sub: subject
+  - aud: audience
+  - exp: expiration time
+  - nbf: not before
+  - iat: issued at
+  - jti: JWT ID
+
+- JWT Algorithms
+
+  - HS256: HMAC with SHA-256
+  - HS384: HMAC with SHA-384
+  - HS512: HMAC with SHA-512
+  - RS256: RSA with SHA-256
+  - RS384: RSA with SHA-384
+  - RS512: RSA with SHA-512
+  - ES256: ECDSA with SHA-256
+  - ES384: ECDSA with SHA-384
+  - ES512: ECDSA with SHA-512
+
+- JWT Best Practices
+
+  - always use HTTPS
+  - never store sensitive information in the payload
+  - always validate the token
+  - always use strong secret keys
+  - always set the expiration time
+  - always use the latest version of the library
 
 [Back to top](#table-of-contents)

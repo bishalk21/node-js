@@ -66,3 +66,12 @@
 - never trust the data coming from the client
 - install bcrypt library
 - hash the password before saving it to the database
+
+- install cookie-parser library
+- send dummy cookie to the client
+- create /profile api to read the cookie from the clients
+- install jsonwebtoken library
+- create a login api
+- in login api, check if email and password are correct
+- create a token using jwt.sign() and send it to the client
+- read the token from the client and verify it using jwt.verify() in /profile api and send the user data
