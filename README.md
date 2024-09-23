@@ -122,6 +122,61 @@ This project is a simple Node.js project that demonstrates how to create a simpl
   | GET          | /api/v1/receivedRequests          | Get all requests received |
   | GET          | /api/v1/sentRequests              | Get all requests sent     |
 
+- Project DevConnect API design
+
+  - all the api endpoints will be prefixed with `/api/v1`
+
+| HTTP Methods | Endpoint                                | Description                 |
+| ------------ | --------------------------------------- | --------------------------- |
+| POST         | /signup                                 | Create a new user           |
+| POST         | /login                                  | Login user                  |
+| POST         | /logout                                 | Logout user                 |
+| GET          | /profile/view                           | Get all users               |
+| PATCH        | /profile/edit                           | Update user                 |
+| PATCH        | /profile/password                       | Update password             |
+| POST         | /request/send/interested/:userId        | Send connection request     |
+| POST         | /request/send/ignore/:userId            | Ignore connection request   |
+| POST         | /request/review/accepted/:requestUserId | Accept connection request   |
+| POST         | /request/review/rejected/:requestUserId | Reject connection request   |
+| GET          | /user/requests/received                 | Get all requests received   |
+| GET          | /user/connections                       | Get all connections         |
+| GET          | /user/feed                              | get users (10) dev profiles |
+
+- STATUS
+
+  - ignore
+  - pending
+  - accepted
+  - rejected
+
+- file structure
+
+  - backend
+    - index.js
+    - package.json
+    - package-lock.json
+    - .gitignore
+    - .env
+    - src
+      - routers
+        - authRouter.js
+          - POST /signup
+          - POST /login
+          - POST /logout
+        - profileRouter.js
+          - GET /profile/view
+          - PATCH /profile/edit
+          - PATCH /profile/password
+        - connectionRequestRouter.js
+          - POST /request/send/interested/:userId
+          - POST /request/send/ignore/:userId
+          - POST /request/review/accepted/:requestUserId
+          - POST /request/review/rejected/:requestUserId
+        - userRequestRouter.js
+          - GET /user/requests/received
+          - GET /user/connections
+          - GET /user/feed
+
 - UI/UX Design
 
   - Wireframes
@@ -257,6 +312,46 @@ Express is a minimal and flexible Node.js web application framework that provide
 - Request > Middleware > Route Handler > Response
 
 > NEVER trust request.body, request.query, request.params
+
+### Router in Express
+
+> if we have multiple routes in our application, we can use express.Router() to create a router object and define the routes in the router object
+
+```js
+const express = require("express");
+const router = express.Router();
+
+router.get("/", (req, res, next) => {
+  res.send("Hello World");
+});
+
+router.get("/about", (req, res, next) => {
+  res.send("About Us");
+});
+
+module.exports = router;
+```
+
+```js
+const express = require("express");
+const app = express();
+
+const router = require("./router");
+
+app.use("/", router);
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
+```
+
+- app.use(): use middleware to handle all types of requests
+- app.get(): get request
+- app.post(): post request
+- app.put(): put request
+- app.delete(): delete request
+
+[Back to top](#table-of-contents)
 
 ## What is Middleware?
 

@@ -1,5 +1,5 @@
 const { verifyJwtToken } = require("../helpers/jwtHelper");
-const testUser = require("../models/user/user");
+const { testUserModel } = require("../models/user/user");
 
 // auth middleware for authenticating and authorizing access to the routes
 const authAdmin = async (req, res, next) => {
@@ -11,7 +11,7 @@ const authAdmin = async (req, res, next) => {
 
     const decoded = await verifyJwtToken(token);
     const { id } = decoded;
-    const user = await testUser.findById(id);
+    const user = await testUserModel.findById(id);
     if (!user) {
       throw new Error("User not found");
     }

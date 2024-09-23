@@ -100,4 +100,4 @@ testUserSchema.methods.validatePassword = async function (passwordInputByUser) {
 };
 
 const testUserModel = mongoose.model("Test-user", testUserSchema);
-module.exports = testUserModel;
+module.exports = { testUserModel };

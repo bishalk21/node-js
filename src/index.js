@@ -3,17 +3,20 @@ const express = require("express");
 const connectDB = require("./config/dbConfig");
 const { authAdmin, authAdmins, userAuth } = require("./middlewares/auth");
 const testUser = require("./models/user/user");
-const { validateSignUpData } = require("./helpers/validation");
-const { hashPassword, comparePassword } = require("./helpers/bcryptHelper");
 const validator = require("validator");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const { createSignAccessJWT, verifyJwtToken } = require("./helpers/jwtHelper");
+const authRouter = require("./routers/auth/authRouter.js");
+const requestConnectionRouter = require("./routers/connections/requestConnectionRouter.js");
 
 const app = express();
 // middleware to parse JSON data
 app.use(express.json());
 app.use(cookieParser());
+
+// auth route handler
+app.use("/api/v1/auth", authRouter);
+// connection request route handler
+app.use("/api/v1/request", requestConnectionRouter);
 
 // test user
 // app.post("/sign-up", async (req, res, next) => {
@@ -36,37 +39,37 @@ app.use(cookieParser());
 //   }
 // });
 
-app.post("/sign-up", async (req, res, next) => {
-  try {
-    // console.log(req); // express responds with object containing request details
+// app.post("/sign-up", async (req, res, next) => {
+//   try {
+//     // console.log(req); // express responds with object containing request details
 
-    // encrypting password
-    //  validation of data
-    validateSignUpData(req);
+//     // encrypting password
+//     //  validation of data
+//     validateSignUpData(req);
 
-    // encrypting password
-    const password = req.body.password;
-    const hashedPassword = await hashPassword(password);
+//     // encrypting password
+//     const password = req.body.password;
+//     const hashedPassword = await hashPassword(password);
 
-    // console.log(req.body);
-    // if the body is empty, it will return undefined
-    // if the body is in JSON format, it will return the undefined as server cannot read JSON data
-    // to read JSON data, we need to use middleware to parse the JSON data (body-parser or express.json())
+//     // console.log(req.body);
+//     // if the body is empty, it will return undefined
+//     // if the body is in JSON format, it will return the undefined as server cannot read JSON data
+//     // to read JSON data, we need to use middleware to parse the JSON data (body-parser or express.json())
 
-    // saving user
-    const newUser = {
-      ...req.body,
-      password: hashedPassword,
-    };
+//     // saving user
+//     const newUser = {
+//       ...req.body,
+//       password: hashedPassword,
+//     };
 
-    const user = new testUser(newUser);
-    // const user = new testUser(req.body);
-    await user.save();
-    res.send("User Created Successfully");
-  } catch (error) {
-    res.status(500).send("Error saving user:" + error.message);
-  }
-});
+//     const user = new testUser(newUser);
+//     // const user = new testUser(req.body);
+//     await user.save();
+//     res.send("User Created Successfully");
+//   } catch (error) {
+//     res.status(500).send("Error saving user:" + error.message);
+//   }
+// });
 
 // find user by email
 app.get("/user", async (req, res, next) => {
