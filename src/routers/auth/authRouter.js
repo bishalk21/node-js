@@ -5,6 +5,7 @@ const { testUserModel } = require("../../models/user/user");
 const validator = require("validator");
 const router = express.Router();
 
+// sign-up api
 router.post("/sign-up", async (req, res, next) => {
   try {
     // console.log(req); // express responds with object containing request details
@@ -73,6 +74,18 @@ router.post("/login", async (req, res, next) => {
     }
   } catch (error) {
     res.status(500).send("Error logging in user: " + error.message);
+  }
+});
+
+// logout api
+router.post("/logout", async (req, res, next) => {
+  try {
+    res.cookie("token", null, {
+      expires: new Date(Date.now()),
+    });
+    res.send("User logged out successfully");
+  } catch (error) {
+    res.status(500).send("Error logging out user: " + error.message);
   }
 });
 

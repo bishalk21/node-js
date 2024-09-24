@@ -26,7 +26,6 @@ const authAdmin = async (req, res, next) => {
 // dummy auth middleware
 const authAdmins = (req, res, next) => {
   console.log("Admin auth is getting called");
-  // const token = req.headers?.authorization;
   const dummyToken = "admin";
   const isAdminAuthenticated = dummyToken === "admin";
   if (!isAdminAuthenticated) {
@@ -38,7 +37,6 @@ const authAdmins = (req, res, next) => {
 
 const userAuth = (req, res, next) => {
   console.log("User auth is getting called");
-  // const token = req.headers?.authorization;
   const dummyToken = "user";
   const isUserAuthenticated = dummyToken === "user";
   if (!isUserAuthenticated) {
