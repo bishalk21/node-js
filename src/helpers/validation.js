@@ -15,4 +15,26 @@ const validateSignUpData = (req) => {
   }
 };
 
-module.exports = { validateSignUpData };
+const validateProfileEditData = (req) => {
+  const UPDATE_ALLOWED_FIELDS = [
+    "firstName",
+    "lastName",
+    "about",
+    "age",
+    "photoUrl",
+    "skills",
+  ];
+
+  const fields = Object.keys(req.body);
+  const isUpdateAllowed = fields.every((field) => {
+    return UPDATE_ALLOWED_FIELDS.includes(field);
+  });
+
+  if (!isUpdateAllowed) {
+    throw new Error("Invalid fields for update");
+  }
+
+  return true;
+};
+
+module.exports = { validateSignUpData, validateProfileEditData };

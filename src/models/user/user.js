@@ -9,6 +9,7 @@ const testUserSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: true,
+      index: true,
       minlength: 3,
       maxlength: 50,
     },
@@ -44,11 +45,15 @@ const testUserSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      validate(value) {
-        if (!["male", "female", "others"].includes(value)) {
-          throw new Error("Gender data is invalid");
-        }
+      enum: {
+        values: ["male", "female", "other"],
+        message: "{VALUE} is not supported",
       },
+      // validate(value) {
+      //   if (!["male", "female", "others"].includes(value)) {
+      //     throw new Error("Gender data is invalid");
+      //   }
+      // },
     },
     photoUrl: {
       type: String,
@@ -72,6 +77,8 @@ const testUserSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+testUserSchema.index({ firstName: 1, email: 1 }, { unique: true });
 
 // instance method to create jwt token
 testUserSchema.methods.createJWT = async function () {

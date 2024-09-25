@@ -1,7 +1,9 @@
 const express = require("express");
+const { authAdmin } = require("../../middlewares/auth");
+const { validateProfileEditData } = require("../../helpers/validation");
 const router = express.Router();
 
-router.get("/profile", authAdmin, async (req, res, next) => {
+router.get("/view", authAdmin, async (req, res, next) => {
   try {
     // get the cookie
     // console.log(req.cookies);
@@ -36,5 +38,35 @@ router.get("/profile", authAdmin, async (req, res, next) => {
     res.status(500).send("Error fetching dashboard: " + error.message);
   }
 });
+
+router.patch("/edit", authAdmin, async (req, res, next) => {
+  try {
+    // validate data
+    if (!validateProfileEditData(req)) {
+      throw new Error("Invalid fields for update");
+    }
+
+    const loggedInUser = req.user;
+    // console.log("before update", loggedInUser);
+
+    Object.keys(req.body).forEach(
+      (field) => (loggedInUser[field] = req.body[field])
+    );
+
+    // console.log("after update", loggedInUser);
+    // save the updated user
+    const updatedUser = await loggedInUser.save();
+
+    res.send({
+      message: `Hey ${loggedInUser.firstName}, your profile is updated successfully`,
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).send("Error updating user: " + error.message);
+  }
+});
+
+// forgot password
+router.post("/forgot-password", async (req, res, next) => {});
 
 module.exports = router;

@@ -28,6 +28,8 @@
   - [TCP/IP Connection](#tcpip-connection)
   - [Cookies in Express](#cookies-in-express)
   - [JWT (JSON Web Tokens)](#jwt-json-web-tokens)
+  - [API level validation](#api-level-validation)
+  - [Pre and Post Hooks in Mongoose](#pre-and-post-hooks-in-mongoose)
 
 ## About Project
 
@@ -166,7 +168,7 @@ This project is a simple Node.js project that demonstrates how to create a simpl
         - profileRouter.js
           - GET /profile/view
           - PATCH /profile/edit
-          - PATCH /profile/password
+          - PATCH /profile/forgot-password
         - connectionRequestRouter.js
           - POST /request/send/interested/:userId
           - POST /request/send/ignore/:userId
@@ -1174,3 +1176,107 @@ const user = new User({
 // 5. use the instance method
 const isValid = await user.comparePassword("123");
 ```
+
+### Logical DB Queries and Compound Indexes
+
+- Logical DB Queries
+
+  - $and: performs a logical AND operation on an array of two or more expressions and selects the documents that satisfy all the expressions
+  - $or: performs a logical OR operation on an array of two or more expressions and selects the documents that satisfy at least one of the expressions
+    - takes an array of expressions and selects the documents that satisfy at least one of the expressions
+    ```js
+    db.users.find({
+      $or: [{ name: "John Doe" }, { email: "" }],
+    });
+    ```
+  - $not: performs a logical NOT operation on an expression and selects the documents that do not match the expression
+  - $nor: performs a logical NOR operation on an array of two or more expressions and selects the documents that fail all the expressions
+
+- Compound Indexes
+
+  - when a query involves multiple fields, a compound index can be used to improve the performance of the query
+
+  - an index that consists of multiple fields
+  - used to improve the performance of queries that involve multiple fields
+  - can be created on multiple fields in a collection
+  - can be used to speed up queries that involve multiple fields
+  - can be used to speed up queries that involve sorting, filtering, and grouping
+
+```js
+// 1. create a compound index
+db.users.createIndex({ name: 1, email: 1 });
+
+// 2. find documents using a compound index
+db.users.find({ name: "John Doe", email: "" });
+
+// 3. explain the query plan
+db.users.find({ name: "John Doe", email: "" }).explain("executionStats");
+```
+
+[Back to top](#table-of-contents)
+
+### Pre and Post Hooks in Mongoose
+
+- pre hooks: middleware functions that are executed before a specific operation is performed on the model
+
+```js
+// 1. create a schema
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+});
+
+// 2. create a pre hook
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+  next();
+});
+
+// 3. create a model
+const User = mongoose.model("User", userSchema);
+
+// 4. create an instance of the model
+const user = new User({
+  name: "John Doe",
+  email: "",
+  password: "123",
+});
+
+// 5. save the instance
+await user.save();
+```
+
+- post hooks: middleware functions that are executed after a specific operation is performed on the model
+
+```js
+// 1. create a schema
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+});
+
+// 2. create a post hook
+userSchema.post("save", async function (doc, next) {
+  console.log("User saved", doc);
+  next();
+});
+
+// 3. create a model
+const User = mongoose.model("User", userSchema);
+
+// 4. create an instance of the model
+const user = new User({
+  name: "John Doe",
+  email: "",
+  password: "123",
+});
+
+// 5. save the instance
+await user.save();
+```
+
+[Back to top](#table-of-contents)
