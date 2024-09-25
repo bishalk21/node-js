@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const authRouter = require("./routers/auth/authRouter.js");
 const requestConnectionRouter = require("./routers/connections/requestConnectionRouter.js");
 const profileRouter = require("./routers/profile/profileRouter.js");
+const userRouter = require("./routers/test-user/userRouter.js");
 
 const app = express();
 // middleware to parse JSON data
@@ -20,6 +21,8 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/request", requestConnectionRouter);
 // profile route handler
 app.use("/api/v1/profile", profileRouter);
+// user request route handler
+app.use("/api/v1/user", userRouter);
 
 // test user
 // app.post("/sign-up", async (req, res, next) => {

@@ -128,21 +128,21 @@ This project is a simple Node.js project that demonstrates how to create a simpl
 
   - all the api endpoints will be prefixed with `/api/v1`
 
-| HTTP Methods | Endpoint                                | Description                 |
-| ------------ | --------------------------------------- | --------------------------- |
-| POST         | /signup                                 | Create a new user           |
-| POST         | /login                                  | Login user                  |
-| POST         | /logout                                 | Logout user                 |
-| GET          | /profile/view                           | Get all users               |
-| PATCH        | /profile/edit                           | Update user                 |
-| PATCH        | /profile/password                       | Update password             |
-| POST         | /request/send/interested/:userId        | Send connection request     |
-| POST         | /request/send/ignore/:userId            | Ignore connection request   |
-| POST         | /request/review/accepted/:requestUserId | Accept connection request   |
-| POST         | /request/review/rejected/:requestUserId | Reject connection request   |
-| GET          | /user/requests/received                 | Get all requests received   |
-| GET          | /user/connections                       | Get all connections         |
-| GET          | /user/feed                              | get users (10) dev profiles |
+| HTTP Methods | Endpoint                               | Description                          |
+| ------------ | -------------------------------------- | ------------------------------------ |
+| POST         | /signup                                | Create a new user                    |
+| POST         | /login                                 | Login user                           |
+| POST         | /logout                                | Logout user                          |
+| GET          | /profile/view                          | Get all users                        |
+| PATCH        | /profile/edit                          | Update user                          |
+| PATCH        | /profile/password                      | Update password                      |
+| POST         | /request/send/:status/:userId          | Send connection request - interested |
+| POST         | /request/send/:status/:userId          | Ignore connection request - ignored  |
+| POST         | /request/review/:status/:requestUserId | Accept connection request - accepted |
+| POST         | /request/review/:status/:requestUserId | Reject connection request - rejected |
+| GET          | /user/requests/received                | Get all requests received            |
+| GET          | /user/connections                      | Get all connections                  |
+| GET          | /user/feed                             | get users (10) dev profiles          |
 
 - STATUS
 
@@ -178,6 +178,40 @@ This project is a simple Node.js project that demonstrates how to create a simpl
           - GET /user/requests/received
           - GET /user/connections
           - GET /user/feed
+
+- Thought Process GET/POST
+
+  - GET /api/v1/users
+
+    - `need to make sure that only allowed data is returned to the client`
+    - get all users
+    - get all users from the database
+    - return all users
+
+  - GET /api/v1/users/:id
+
+    - get user by id
+    - get user by id from the database
+    - return user by id
+
+  - POST /api/v1/users
+
+    - all the request comes in the body, and as attacker can send any data in the body, so we need to validate and sanitize the data before storing in the database
+    - db.save() should be called only after the data is validated and sanitized
+    - create a new user
+    - create a new user in the database
+    - return the new user
+
+  - PUT /api/v1/users/:id
+
+    - update user by id
+    - update user by id in the database
+    - return the updated user
+
+  - DELETE /api/v1/users/:id
+    - delete user by id
+    - delete user by id from the database
+    - return the deleted user
 
 - UI/UX Design
 
@@ -1280,3 +1314,53 @@ await user.save();
 ```
 
 [Back to top](#table-of-contents)
+
+### ref and populate in Mongoose
+
+- ref: a schema type that allows you to reference documents in other collections
+
+```js
+// 1. create a schema
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+});
+
+const postSchema = new mongoose.Schema({
+  title: String,
+  content: String,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+});
+
+// 2. create a model
+const User = mongoose.model("User", userSchema);
+const Post = mongoose.model("Post", postSchema);
+
+// 3. create an instance of the model
+const user = new User({
+  name: "John Doe",
+  email: "",
+  password: "123",
+});
+
+const post = new Post({
+  title: "Hello World",
+  content: "This is a post",
+  user: user._id,
+});
+
+// 4. save the instance
+await user.save();
+await post.save();
+```
+
+- populate: a method that allows you to populate the reference in the query
+
+```js
+// 5. populate the reference
+const posts = await Post.find().populate("user");
+```
