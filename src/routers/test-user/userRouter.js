@@ -32,13 +32,20 @@ router.get("/connections", authAdmin, async (req, res, next) => {
         { fromUserId: loggedInUserId, status: "accepted" },
         { toUserId: loggedInUserId, status: "accepted" },
       ],
-    }).populate("fromUserId", USER_SAFE_DATA);
+    })
+      .populate("fromUserId", USER_SAFE_DATA)
+      .populate("toUserId", USER_SAFE_DATA);
 
-    const data = connections.map((row) => row.fromUserId);
+    const data = connections.map((row) => {
+      if (row.fromUserId._id.toString() === loggedInUserId._id.toString()) {
+        return row.toUserId;
+      }
+      return row.fromUserId;
+    });
 
     res.send({
       message: "Connections fetched successfully",
-      data,
+      connections: data,
     });
   } catch (error) {
     res.statusCode(400).send("Error: " + error.message);
