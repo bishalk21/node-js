@@ -29,7 +29,12 @@
   - [Cookies in Express](#cookies-in-express)
   - [JWT (JSON Web Tokens)](#jwt-json-web-tokens)
   - [API level validation](#api-level-validation)
+  - [Auth Middleware, token verification and protecting routes](#auth-middleware-token-verification-and-protecting-routes)
+  - [Mongoose Schema Methods](#mongoose-schema-methods)
+  - [Logical DB Queries and Compound Indexes](#logical-db-queries-and-compound-indexes)
   - [Pre and Post Hooks in Mongoose](#pre-and-post-hooks-in-mongoose)
+  - [ref and populate in Mongoose](#ref-and-populate-in-mongoose)
+  - [skip(), limit(), sort() and select() in Mongoose](#skip-limit-sort-select-in-mongoose)
 
 ## About Project
 
@@ -967,6 +972,8 @@ const isValid = await bcrypt.compare("123", hashedPassword);
 
   - server sends a response with status code 401 (Unauthorized) and client needs to login again to get a new token
 
+[Back to top](#table-of-contents)
+
 ### Cookies in Express
 
 > need cookie-parser package for handling cookies in express: `npm install cookie-parser`
@@ -1211,6 +1218,8 @@ const user = new User({
 const isValid = await user.comparePassword("123");
 ```
 
+[Back to top](#table-of-contents)
+
 ### Logical DB Queries and Compound Indexes
 
 - Logical DB Queries
@@ -1364,3 +1373,37 @@ await post.save();
 // 5. populate the reference
 const posts = await Post.find().populate("user");
 ```
+
+[Back to top](#table-of-contents)
+
+### skip, limit, sort, select in Mongoose
+
+- skip: a method that allows you to skip a specific number of documents in the query
+
+```js
+// 1. skip a specific number of documents
+const users = await User.find().skip(10);
+```
+
+- limit: a method that allows you to limit the number of documents in the query
+
+```js
+// 2. limit the number of documents
+const users = await User.find().limit(10);
+```
+
+- sort: a method that allows you to sort the documents in the query
+
+```js
+// 3. sort the documents
+const users = await User.find().sort({ name: 1 });
+```
+
+- select: a method that allows you to select specific fields in the query
+
+```js
+// 4. select specific fields
+const users = await User.find().select("name email");
+```
+
+[Back to top](#table-of-contents)
