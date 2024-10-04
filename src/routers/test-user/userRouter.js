@@ -54,7 +54,7 @@ router.get("/connections", authAdmin, async (req, res, next) => {
 });
 
 // feed api
-router.get("/feed?page=1&limit=100", authAdmin, async (req, res, next) => {
+router.get("/feed", authAdmin, async (req, res, next) => {
   try {
     // user [Bishal] should see all the other users [Anil, Suman, Akshay, Arjun, Keshav] except
     // - himself,

@@ -33,13 +33,18 @@ router.get("/view", authAdmin, async (req, res, next) => {
     // }
 
     const user = req.user;
-    res.send(user);
+    user.password = undefined;
+    res.send({
+      message: `Hey ${user.firstName}, welcome to your profile`,
+      user,
+    });
   } catch (error) {
     res.status(500).send("Error fetching dashboard: " + error.message);
   }
 });
 
-router.patch("/edit", authAdmin, async (req, res, next) => {
+// router.patch("/edit", authAdmin, async (req, res, next) => {
+router.put("/edit", authAdmin, async (req, res, next) => {
   try {
     // validate data
     if (!validateProfileEditData(req)) {

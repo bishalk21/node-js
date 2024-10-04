@@ -6,7 +6,8 @@ const authAdmin = async (req, res, next) => {
   try {
     const { token } = req.cookies;
     if (!token) {
-      throw new Error("Unauthorized");
+      // throw new Error("Unauthorized");
+      return res.status(401).send("Please login to access");
     }
 
     const decoded = await verifyJwtToken(token);

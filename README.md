@@ -14,6 +14,8 @@
 
 # Table of Contents
 
+- [Node.js](#nodejs)
+- [JS on Server](#js-on-server)
 - [How express application works](#how-express-application-works)
 - [Middleware](#what-is-middleware)
 - [Routing](#what-is-routing)
@@ -35,6 +37,73 @@
   - [Pre and Post Hooks in Mongoose](#pre-and-post-hooks-in-mongoose)
   - [ref and populate in Mongoose](#ref-and-populate-in-mongoose)
   - [skip(), limit(), sort() and select() in Mongoose](#skip-limit-sort-select-in-mongoose)
+
+## Node.js
+
+- cross-platform (runs on Windows, macOS, and Linux, and more), , open-source JavaScript runtime environment
+- runs on the V8 JavaScript engine, the core of Google Chrome
+- asynchronous, event-driven architecture, non-blocking I/O model (asynchronous I/O)
+- executes JavaScript code outside a web browser
+- maintained by the openJS Foundation
+- built by Ryan Dahl in 2009
+- JS engine: V8 engine (written in C++) compiles and executes JavaScript code
+- Ryan started with spider-monkey js engine (on Firefox) but it was slow, later he switched to V8 engine (on Chrome) which was faster
+- Ryan was working independently on the project, and Joyent (cloud computing company) hired him to work on the project
+- earlier name of Node.js was web.js, later it was changed to Node.js as it was intended to be used for more than just web servers
+- Apache HTTP server was blocking server, so Ryan wanted to create a non-blocking server which is why node.js is a non-blocking I/O model (asynchronous I/O) or it can handle multiple requests at the same time with a small number of threads
+
+## NPM (Node Package Manager)
+
+- In 2010, npm (Node Package Manager) was introduced for Node.js by Isaac Z. Schlueter who started managing Node.js since 2012
+- node.js was initially built only for macOS and linux, later it gained support for Windows
+- in 2014, Fedor (developer) created a fork of node.js called io.js, later io.js and node.js merged to create Node.js Foundation in 2015
+- in 2019, Node.js Foundation and JS Foundation merged to create OpenJS Foundation
+
+## JS on Server
+
+1. What is server?
+
+- a computer program or a device that provides functionality (data, services, resources or programs) for other programs or devices, called clients, over a network
+- essentially a remote computer or a computer whose CPU works remotely
+- servers can be accessed over a network to provide resources and services to other computer programs or devices
+- when computer or client needs to communicate with server, it sends a request to the server over the network using its IP address and port number. Initially, javascript could only be executed within browsers, but with the introduction of Node.js, javascript can now be executed on the server side as well, allowing developers to write server-side code in javascript
+
+2. What is IP address?
+
+- a unique number that identifies each device connected to a computer network
+- an Internet Protocol address is a numerical label assigned to each device connected to a computer network that uses the Internet Protocol for communication
+
+3. What is port number?
+
+- a communication endpoint in a network
+- a port is a communication endpoint that identifies a specific process or a type of service running on a computer
+- a port number is a 16-bit unsigned integer, thus ranging from 0 to 65535
+
+4. What is V8 engine?
+
+- a open-source high-performance JavaScript and WebAssembly engine, written in C++
+- used in Google Chrome and Chromium web browsers, in Node.js, and in Deno
+- implements ECMAScript and WebAssembly, and runs on Windows 7 or later, macOS 10.12+, and Linux systems that use x64, IA-32, ARM, or MIPS processors
+- can be embedded into any C++ application
+- js code is compiled to machine code, which is executed directly by the CPU
+
+  > V8 engine follows the ECMAScript standard, node.js has v8 engines
+  > node.js has superpowers like api calls on servers, file system access, etc., which makes it powerful than v8 engine alone, which can not do database operations, file system operations, etc. because of ecmascript standard (this is known as js runtime)
+  > v8 is c++ code
+  > js code (high-level script) > v8 engine > machine code (low-level code) > executed by CPU
+
+5. What is EcmaScript?
+
+- standard for scripting languages, including JavaScript, JScript, and ActionScript
+- standardized by Ecma International in ECMA-262 and ISO/IEC 16262
+- Ecmascript standards are followed by js engines like V8, SpiderMonkey, Chakra, etc.
+
+6. What is low-level code?
+
+- code that is close to machine code and hardware level
+- provides little or no abstraction from a computer's instruction set architecture and allows for fine grained control over hardware and software resources
+- machine language: the most basic form of low-level code, consisting of binary code (0s and 1s) that can be executed directly by a computer's CPU
+- assembly language: a step up from machine language, consisting of mnemonics (symbolic representations) and symbols that represent machine code instructions for operations and memory locations or addresses, making it somewhat easier for humans to read and write than machine code
 
 ## About Project
 

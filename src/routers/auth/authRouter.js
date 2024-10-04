@@ -31,8 +31,19 @@ router.post("/sign-up", async (req, res, next) => {
 
     const user = new testUserModel(newUser);
     // const user = new testUser(req.body);
-    await user.save();
-    res.send("User Created Successfully");
+
+    const savedUser = await user.save();
+    savedUser.password = undefined;
+
+    const token = await savedUser.createJWT();
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    });
+
+    res.send({
+      message: "User saved successfully",
+      user: savedUser,
+    });
   } catch (error) {
     res.status(500).send("Error saving user:" + error.message);
   }
@@ -70,10 +81,19 @@ router.post("/login", async (req, res, next) => {
       res.cookie("token", token, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
       });
-      res.send("User logged in successfully");
+
+      // in response, send the user details and token excluding password, createdAt, updatedAt, _v
+      user.password = undefined;
+
+      res.send({
+        message: "User logged in successfully",
+        user,
+      });
     }
   } catch (error) {
-    res.status(500).send("Error logging in user: " + error.message);
+    res.status(500).send({
+      message: "Error logging in user: " + error.message,
+    });
   }
 });
 

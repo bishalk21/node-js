@@ -9,11 +9,33 @@ const authRouter = require("./routers/auth/authRouter.js");
 const requestConnectionRouter = require("./routers/connections/requestConnectionRouter.js");
 const profileRouter = require("./routers/profile/profileRouter.js");
 const userRouter = require("./routers/test-user/userRouter.js");
+const cors = require("cors");
 
 const app = express();
 // middleware to parse JSON data
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+
+  next();
+});
 
 // auth route handler
 app.use("/api/v1/auth", authRouter);
